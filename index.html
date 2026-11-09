@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Case Review System | FahimDev Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#090d16',
+                        cardbg: '#111827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes rainbowGlow {
+            0% { color: #ff3366; text-shadow: 0 0 15px rgba(255,51,102,0.6); }
+            20% { color: #ff9933; text-shadow: 0 0 15px rgba(255,153,51,0.6); }
+            40% { color: #ffff33; text-shadow: 0 0 15px rgba(255,255,51,0.6); }
+            60% { color: #33ff66; text-shadow: 0 0 15px rgba(51,255,102,0.6); }
+            80% { color: #33ccff; text-shadow: 0 0 15px rgba(51,204,255,0.6); }
+            100% { color: #ff3366; text-shadow: 0 0 15px rgba(255,51,102,0.6); }
+        }
+        .rainbow-text {
+            animation: rainbowGlow 5s linear infinite;
+            font-weight: 900;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-darker text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white font-sans">
+
+    <!-- Top Navigation / Header Bar -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-slate-800/80 px-4 py-3.5 shadow-2xl">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo / Branding -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white font-bold text-lg">
+                    FD
+                </div>
+                <div>
+                    <div class="text-xl tracking-wider rainbow-text">FAHIMDEV</div>
+                    <p class="text-[10px] text-slate-400 tracking-widest uppercase">Secure Portal</p>
+                </div>
+            </div>
+
+            <!-- Auth Panel -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <div id="auth-section" class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 shadow-inner">
+                    <input type="password" id="access-code-input" placeholder="Enter Access Code..." 
+                        class="bg-transparent text-xs sm:text-sm text-slate-200 focus:outline-none px-2 py-1 w-36 sm:w-44">
+                    <button onclick="verifyCode()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition shadow-md shadow-indigo-600/30">
+                        Login
+                    </button>
+                </div>
+                
+                <!-- Status Badges -->
+                <div id="owner-badge" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs px-3.5 py-2 rounded-xl font-medium flex items-center gap-2 shadow-lg">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Owner Active (Full Access)
+                </div>
+                <div id="reviewer-badge" class="hidden bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs px-3.5 py-2 rounded-xl font-medium flex items-center gap-2 shadow-lg">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    Reviewer Active (Farzana Madam)
+                </div>
+                <div id="user-badge" class="bg-slate-900/90 border border-slate-800 text-slate-400 text-xs px-3.5 py-2 rounded-xl font-medium flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                    Normal User
+                </div>
+                
+                <button id="logout-btn" onclick="logoutSession()" class="hidden text-slate-400 hover:text-rose-400 text-xs font-medium bg-slate-900 px-3 py-2 rounded-xl border border-slate-800 transition">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 my-6 flex-grow space-y-6">
+
+        <!-- Welcome Banner -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-slate-900/80 border border-indigo-500/20 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">Student Case Review Dashboard</h1>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6 max-w-3xl">
+                Assalamu Alaikum Faraza Mam! This premium institutional workspace ensures real-time tracking, evaluation, and management of student cases securely across all devices.
+            </p>
+            <div class="flex flex-wrap items-center gap-6 text-xs text-indigo-200/90 border-t border-indigo-500/20 pt-4 font-medium">
+                <span class="flex items-center gap-2 bg-indigo-950/60 px-3 py-1.5 rounded-lg border border-indigo-500/30">
+                    <span class="text-slate-400">Created by:</span> MD. FAHIM (FAHIMDEV)
+                </span>
+                <span class="flex items-center gap-2 bg-indigo-950/60 px-3 py-1.5 rounded-lg border border-indigo-500/30">
+                    <span class="text-slate-400">Reviewed by:</span> FARZANA MADAM
+                </span>
+            </div>
+        </div>
+
+        <!-- Owner Panel: Code & Permission Manager -->
+        <div id="owner-management-panel" class="hidden glass-panel rounded-3xl p-6 shadow-2xl space-y-4 border-indigo-500/30">
+            <h2 class="text-base sm:text-lg font-bold text-indigo-300 flex items-center gap-2.5">
+                Owner Control Center: Access Management
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">New Custom Access Code</label>
+                    <input type="text" id="new-custom-code" placeholder="e.g., TEACHERKEY99" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Target Role Assignment</label>
+                    <select id="new-code-role" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="reviewer">Reviewer Role (Madam)</option>
+                        <option value="owner">Owner Role (Fahim)</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="generateNewCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">Generate Code</button>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 pt-3 border-t border-slate-800/80 flex flex-wrap gap-4">
+                <span>Default Reviewer: <code class="text-indigo-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">REVIEWER1</code></span>
+                <span>Default Owner: <code class="text-indigo-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">Fahimisonlyademon</code></span>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="notification-banner" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-5 py-3.5 rounded-2xl text-sm flex items-center justify-between shadow-xl backdrop-blur-md">
+            <span id="notification-text" class="font-medium">Action completed successfully!</span>
+            <button onclick="dismissNotification()" class="text-emerald-400 hover:text-white font-bold text-lg">&times;</button>
+        </div>
+
+        <!-- Add Case Form Section -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <h2 class="text-lg font-bold text-slate-200 mb-5 flex items-center gap-2.5">
+                Register New Student Case
+            </h2>
+            <form id="case-form" onsubmit="handleCaseSubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Student Name & Roll Number</label>
+                        <input type="text" id="student-name" required placeholder="e.g., Student Name (Roll 05)" 
+                            class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Case Category / Classification</label>
+                        <select id="case-category" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+                            <option value="Behavioral">Behavioral Observation</option>
+                            <option value="Academic">Academic Performance</option>
+                            <option value="Attendance">Attendance / Uniform</option>
+                            <option value="General">General Review Note</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Case Detailed Description</label>
+                    <textarea id="case-text" rows="3" required placeholder="Write comprehensive case notes here..." 
+                        class="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition resize-none shadow-inner"></textarea>
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold px-8 py-3 rounded-xl text-sm transition shadow-xl shadow-indigo-600/30">
+                        Submit & Broadcast Case
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Cases Feed Section -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                    Active Web Cases Feed
+                </h3>
+                <span id="case-count" class="text-xs bg-slate-900 border border-slate-800 text-slate-300 font-semibold px-3.5 py-1.5 rounded-xl shadow">0 Cases Loaded</span>
+            </div>
+            
+            <div id="cases-container" class="space-y-4">
+                <div class="text-center py-12 glass-panel rounded-3xl text-slate-400 text-sm">Loading active cases from Firebase Realtime Database...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-slate-100">Edit Student Case (Owner Mode)</h3>
+            <input type="hidden" id="edit-case-id">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Student Name & Roll</label>
+                <input type="text" id="edit-student-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Category</label>
+                <select id="edit-case-category" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200">
+                    <option value="Behavioral">Behavioral Observation</option>
+                    <option value="Academic">Academic Performance</option>
+                    <option value="Attendance">Attendance / Uniform</option>
+                    <option value="General">General Review Note</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5">Case Description</label>
+                <textarea id="edit-case-text" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 resize-none"></textarea>
+            </div>
+            <div class="flex justify-end gap-3 pt-3">
+                <button onclick="closeEditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-medium transition">Cancel</button>
+                <button onclick="saveEditedCase()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/30">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-slate-800 py-6 px-4 text-center text-xs text-slate-400 space-y-2 mt-12">
+        <p>Created with dedication by <strong class="text-slate-200">MD. FAHIM</strong> (Cyber Name: <span class="rainbow-text">FAHIMDEV</span>)</p>
+        <p>Reviewed under the guidance of <strong class="text-slate-200">FARZANA MADAM</strong> • Banani Model School</p>
+    </footer>
+
+    <!-- Firebase Realtime Database Integration Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, set, remove, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Your Firebase Realtime Database Configuration using your exact URL
+        const firebaseConfig = {
+            databaseURL: "https://case-e986f-default-rtdb.firebaseio.com/"
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+        } catch (e) {
+            console.error("Firebase connection error:", e);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateRoleUI();
+            initRealtimeSync();
+        });
+
+        window.verifyCode = function() {
+            const inputCode = document.getElementById('access-code-input').value.trim();
+            let customCodes = JSON.parse(localStorage.getItem('fahimdev_custom_codes') || '{}');
+
+            if (inputCode === 'Fahimisonlyademon' || customCodes[inputCode] === 'owner') {
+                localStorage.setItem('fahimdev_role', 'owner');
+                updateRoleUI();
+                showNotification("Owner privileges activated successfully!");
+                setTimeout(() => window.location.reload(), 1000);
+            } else if (inputCode === 'REVIEWER1' || customCodes[inputCode] === 'reviewer') {
+                localStorage.setItem('fahimdev_role', 'reviewer');
+                updateRoleUI();
+                showNotification("Reviewer role activated for Farzana Madam!");
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                alert("Incorrect access code!");
+            }
+        }
+
+        window.logoutSession = function() {
+            localStorage.removeItem('fahimdev_role');
+            updateRoleUI();
+            showNotification("Logged out successfully.");
+            setTimeout(() => window.location.reload(), 1000);
+        }
+
+        function updateRoleUI() {
+            const role = localStorage.getItem('fahimdev_role');
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('owner-badge').classList.add('hidden');
+            document.getElementById('reviewer-badge').classList.add('hidden');
+            document.getElementById('user-badge').classList.add('hidden');
+            document.getElementById('logout-btn').classList.add('hidden');
+            document.getElementById('owner-management-panel').classList.add('hidden');
+
+            if (role === 'owner') {
+                document.getElementById('owner-badge').classList.remove('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+                document.getElementById('owner-management-panel').classList.remove('hidden');
+            } else if (role === 'reviewer') {
+                document.getElementById('reviewer-badge').classList.remove('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-section').classList.remove('hidden');
+                document.getElementById('user-badge').classList.remove('hidden');
+            }
+        }
+
+        window.generateNewCode = function() {
+            if (localStorage.getItem('fahimdev_role') !== 'owner') {
+                alert("Owner permission required!");
+                return;
+            }
+            const newCode = document.getElementById('new-custom-code').value.trim();
+            const role = document.getElementById('new-code-role').value;
+
+            if (!newCode) {
+                alert("Please enter a valid code!");
+                return;
+            }
+
+            let customCodes = JSON.parse(localStorage.getItem('fahimdev_custom_codes') || '{}');
+            customCodes[newCode] = role;
+            localStorage.setItem('fahimdev_custom_codes', JSON.stringify(customCodes));
+            
+            document.getElementById('new-custom-code').value = '';
+            showNotification(`Code '${newCode}' successfully created!`);
+        }
+
+        window.handleCaseSubmit = async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('student-name').value;
+            const category = document.getElementById('case-category').value;
+            const text = document.getElementById('case-text').value;
+
+            const newCaseData = {
+                studentName: name,
+                category: category,
+                caseText: text,
+                status: 'Pending Review',
+                createdAt: Date.now(),
+                addedBy: localStorage.getItem('fahimdev_role') || 'User'
+            };
+
+            if (db) {
+                try {
+                    const casesRef = ref(db, 'student_cases');
+                    await push(casesRef, newCaseData);
+                    document.getElementById('case-form').reset();
+                    showNotification("Case successfully saved and synced across all devices!");
+                } catch (e) {
+                    alert("Failed to save to database. Check network connection.");
+                }
+            } else {
+                alert("Database not connected!");
+            }
+        }
+
+        window.updateCaseStatus = async function(caseId, statusText) {
+            const role = localStorage.getItem('fahimdev_role');
+            if (role !== 'owner' && role !== 'reviewer') {
+                alert("Permission denied! Reviewer or Owner access needed.");
+                return;
+            }
+
+            if (db) {
+                try {
+                    const caseRef = ref(db, 'student_cases/' + caseId);
+                    await update(caseRef, { status: statusText });
+                    showNotification(`Case marked as: ${statusText}`);
+                } catch (e) {
+                    alert("Failed to update status.");
+                }
+            }
+        }
+
+        window.deleteCase = async function(caseId) {
+            if (localStorage.getItem('fahimdev_role') !== 'owner') {
+                alert("Owner permission required!");
+                return;
+            }
+            if (confirm("Are you sure you want to permanently delete this case?")) {
+                if (db) {
+                    try {
+                        const caseRef = ref(db, 'student_cases/' + caseId);
+                        await remove(caseRef);
+                        showNotification("Case deleted successfully.");
+                    } catch (e) {
+                        alert("Failed to delete case.");
+                    }
+                }
+            }
+        }
+
+        window.openEditModal = function(caseId, name, category, text) {
+            if (localStorage.getItem('fahimdev_role') !== 'owner') {
+                alert("Owner permission required!");
+                return;
+            }
+            document.getElementById('edit-case-id').value = caseId;
+            document.getElementById('edit-student-name').value = name;
+            document.getElementById('edit-case-category').value = category;
+            document.getElementById('edit-case-text').value = text;
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        window.closeEditModal = function() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        window.saveEditedCase = async function() {
+            const caseId = document.getElementById('edit-case-id').value;
+            const name = document.getElementById('edit-student-name').value;
+            const category = document.getElementById('edit-case-category').value;
+            const text = document.getElementById('edit-case-text').value;
+
+            if (db) {
+                try {
+                    const caseRef = ref(db, 'student_cases/' + caseId);
+                    await update(caseRef, {
+                        studentName: name,
+                        category: category,
+                        caseText: text
+                    });
+                    closeEditModal();
+                    showNotification("Case updated successfully.");
+                } catch (e) {
+                    alert("Failed to update case.");
+                }
+            }
+        }
+
+        function initRealtimeSync() {
+            if (!db) return;
+            const casesRef = ref(db, 'student_cases');
+            
+            onValue(casesRef, (snapshot) => {
+                const data = snapshot.val();
+                const role = localStorage.getItem('fahimdev_role');
+                const isOwner = role === 'owner';
+                const isReviewer = role === 'reviewer' || isOwner;
+
+                const container = document.getElementById('cases-container');
+                container.innerHTML = "";
+
+                if (!data) {
+                    container.innerHTML = `<div class="text-center py-12 glass-panel rounded-3xl text-slate-400 text-sm">No cases recorded yet.</div>`;
+                    document.getElementById('case-count').innerText = `0 Total Cases`;
+                    return;
+                }
+
+                let casesList = [];
+                Object.keys(data).forEach(key => {
+                    casesList.push({ id: key, ...data[key] });
+                });
+
+                // Sort by newest first
+                casesList.sort((a, b) => b.createdAt - a.createdAt);
+
+                let count = casesList.length;
+
+                casesList.forEach((item) => {
+                    const docId = item.id;
+                    const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleString() : 'Just now';
+                    
+                    let statusColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                    if (item.status === 'Accepted') statusColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                    if (item.status === 'Formal Warning Issued') statusColor = "bg-rose-500/10 text-rose-400 border-rose-500/20";
+                    if (item.status === 'Rejected / Bad') statusColor = "bg-slate-700/30 text-slate-400 border-slate-600/30";
+
+                    const reviewerControls = isReviewer ? `
+                        <div class="flex flex-wrap items-center gap-2 mt-4 pt-3.5 border-t border-slate-800/80">
+                            <span class="text-xs text-slate-400 font-semibold mr-2">Review Actions:</span>
+                            <button onclick="updateCaseStatus('${docId}', 'Accepted')" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium px-3 py-1.5 rounded-xl transition shadow-sm">Accept</button>
+                            <button onclick="updateCaseStatus('${docId}', 'Formal Warning Issued')" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-medium px-3 py-1.5 rounded-xl transition shadow-sm">Formal Warning</button>
+                            <button onclick="updateCaseStatus('${docId}', 'Rejected / Bad')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium px-3 py-1.5 rounded-xl transition shadow-sm">Reject / Bad</button>
+                        </div>
+                    ` : '';
+
+                    const ownerControls = isOwner ? `
+                        <div class="flex items-center gap-3 mt-3 justify-end text-xs">
+                            <button onclick="openEditModal('${docId}', '${escapeAttr(item.studentName)}', '${escapeAttr(item.category)}', '${escapeAttr(item.caseText)}')" class="text-indigo-400 hover:text-indigo-300 font-medium underline">Edit Case</button>
+                            <span class="text-slate-700">•</span>
+                            <button onclick="deleteCase('${docId}')" class="text-rose-400 hover:text-rose-300 font-medium underline">Delete</button>
+                        </div>
+                    ` : '';
+
+                    const card = document.createElement('div');
+                    card.className = "glass-panel rounded-3xl p-6 shadow-xl space-y-3.5 transition hover:border-slate-700/80";
+                    card.innerHTML = `
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-bold px-3 py-1 rounded-xl">${escapeHtml(item.category || 'General')}</span>
+                                <h4 class="font-bold text-slate-100 text-base">${escapeHtml(item.studentName)}</h4>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="border text-xs font-semibold px-3 py-1 rounded-xl ${statusColor}">${item.status || 'Pending Review'}</span>
+                                <span class="text-xs text-slate-500">${dateStr}</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-sm whitespace-pre-wrap bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80 leading-relaxed">${escapeHtml(item.caseText)}</p>
+                        ${reviewerControls}
+                        ${ownerControls}
+                    `;
+                    container.appendChild(card);
+                });
+
+                document.getElementById('case-count').innerText = `${count} Total Cases`;
+            }, (error) => {
+                console.error("Database sync error:", error);
+            });
+        }
+
+        function escapeHtml(str) { return str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : ''; }
+        function escapeAttr(str) { return str ? str.replace(/'/g, "&#39;").replace(/"/g, "&quot;") : ''; }
+
+        window.showNotification = function(msg) {
+            const banner = document.getElementById('notification-banner');
+            document.getElementById('notification-text').innerText = msg;
+            banner.classList.remove('hidden');
+            setTimeout(() => banner.classList.add('hidden'), 4000);
+        }
+        window.dismissNotification = function() { document.getElementById('notification-banner').classList.add('hidden'); }
+    </script>
+</body>
+</html>
